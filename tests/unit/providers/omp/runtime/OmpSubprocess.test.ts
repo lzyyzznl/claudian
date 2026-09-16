@@ -110,6 +110,7 @@ describe('OmpSubprocess', () => {
   let launchPrefix: string;
   let launchCliPath: string;
   let launchBunPath: string;
+  let absoluteBunPath: string;
   let launchCommand: string;
   let powerShellCommand: string;
   let absoluteCommand: string;
@@ -148,7 +149,8 @@ describe('OmpSubprocess', () => {
     );
     // The absolute-target shim resolves bun next to the launcher, so the fixture must not depend on
     // the host PATH having bun installed.
-    await writeFile(path.join(launchPrefix, 'absolute-bin', 'bun.exe'), '');
+    absoluteBunPath = path.join(launchPrefix, 'absolute-bin', 'bun.exe');
+    await writeFile(absoluteBunPath, '');
 
     const unownedCliPath = path.join(launchPrefix, 'unowned', 'cli.js');
     unownedCommand = path.join(launchPrefix, 'unowned-bin', 'omp.cmd');
@@ -260,7 +262,7 @@ describe('OmpSubprocess', () => {
     subprocess.start();
 
     expect(mockSpawn).toHaveBeenCalledWith(
-      expect.stringMatching(/bun(?:\.exe)?$/i),
+      launchBunPath,
       [
         launchCliPath,
         '--mode',
@@ -294,7 +296,7 @@ describe('OmpSubprocess', () => {
     subprocess.start();
 
     expect(mockSpawn).toHaveBeenCalledWith(
-      expect.stringMatching(/bun(?:\.exe)?$/i),
+      launchBunPath,
       [launchCliPath, '--mode', 'rpc-ui', '--system-prompt', 'First line\nSecond line'],
       expect.objectContaining({ windowsHide: true }),
     );
@@ -312,7 +314,7 @@ describe('OmpSubprocess', () => {
     subprocess.start();
 
     expect(mockSpawn).toHaveBeenCalledWith(
-      expect.stringMatching(/bun(?:\.exe)?$/i),
+      absoluteBunPath,
       [launchCliPath, '--mode', 'rpc-ui'],
       expect.objectContaining({ windowsHide: true }),
     );
