@@ -146,6 +146,9 @@ describe('OmpSubprocess', () => {
       absoluteCommand,
       `@ECHO off\r\nbun "${launchCliPath}" %*\r\n`,
     );
+    // The absolute-target shim resolves bun next to the launcher, so the fixture must not depend on
+    // the host PATH having bun installed.
+    await writeFile(path.join(launchPrefix, 'absolute-bin', 'bun.exe'), '');
 
     const unownedCliPath = path.join(launchPrefix, 'unowned', 'cli.js');
     unownedCommand = path.join(launchPrefix, 'unowned-bin', 'omp.cmd');
