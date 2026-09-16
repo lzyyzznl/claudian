@@ -140,9 +140,15 @@ function createPatchRendererUnsafeUnref(outputPaths) {
 }
 
 // Obsidian plugin folder path (set via OBSIDIAN_VAULT env var or .env.local)
+// Obsidian identifies a plugin by its folder name, which must match the manifest id.
 const OBSIDIAN_VAULT = process.env.OBSIDIAN_VAULT;
 const OBSIDIAN_PLUGIN_PATH = OBSIDIAN_VAULT && existsSync(OBSIDIAN_VAULT)
-  ? path.join(OBSIDIAN_VAULT, '.obsidian', 'plugins', 'claudian')
+  ? path.join(
+    OBSIDIAN_VAULT,
+    '.obsidian',
+    'plugins',
+    JSON.parse(readFileSync('manifest.json', 'utf-8')).id,
+  )
   : null;
 
 // Plugin to copy built files to Obsidian plugin folder

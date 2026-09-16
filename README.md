@@ -71,8 +71,9 @@ If you use Obsidian Sync across multiple desktop devices, install and update Cla
 1. Clone this repository into your vault's plugins folder:
    ```bash
    cd /path/to/vault/.obsidian/plugins
-   git clone https://github.com/YishenTu/claudian.git
-   cd claudian
+   # The folder name must match the plugin id in manifest.json.
+   git clone https://github.com/YishenTu/claudian.git realclaudian
+   cd realclaudian
    ```
 
 2. Install dependencies and build:
