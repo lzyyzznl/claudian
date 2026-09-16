@@ -1,3 +1,5 @@
+import { JsonlRpcTransport } from '@/core/rpc/JsonlRpcTransport';
+
 import { getRuntimeEnvironmentText } from '../../../core/providers/providerEnvironment';
 import type { ProviderHost } from '../../../core/providers/ProviderHost';
 import { parseEnvironmentVariables } from '../../../utils/env';
@@ -8,7 +10,6 @@ import {
 } from '../models';
 import { getPiProviderSettings } from '../settings';
 import { buildPiLaunchSpec } from './PiLaunchSpec';
-import { PiRpcTransport } from './PiRpcTransport';
 import { PiSubprocess } from './PiSubprocess';
 
 export type PiModelDiscoveryResult =
@@ -47,12 +48,12 @@ export class PiModelDiscoveryService {
       settings,
     });
     const subprocess = new PiSubprocess(launchSpec);
-    let transport: PiRpcTransport | null = null;
+    let transport: JsonlRpcTransport | null = null;
     let removeEventListener: (() => void) | null = null;
 
     try {
       subprocess.start();
-      transport = new PiRpcTransport({
+      transport = new JsonlRpcTransport({
         input: subprocess.stdout,
         onClose: (listener) => subprocess.onClose(listener),
         output: subprocess.stdin,

@@ -2,6 +2,8 @@ import { randomUUID } from 'node:crypto';
 import * as fsp from 'node:fs/promises';
 import * as path from 'node:path';
 
+import type { JsonlRpcRecord } from '@/core/rpc/JsonlRpcTransport';
+
 import {
   type ProviderExecutionErrorCategory,
   type ProviderExecutionEvent,
@@ -71,7 +73,6 @@ import {
   type PiLaunchSpec,
 } from '../runtime/PiLaunchSpec';
 import { buildPiSetModelPayload } from '../runtime/PiRpcPayloads';
-import type { PiRpcRecord } from '../runtime/PiRpcTransport';
 import {
   getPiProviderSettings,
   type PiProviderSettings,
@@ -717,7 +718,7 @@ implements ProviderExecutionSession, SteerableExecutionSession {
   private handleRpcEvent(
     kernel: PiExecutionKernel,
     generation: number,
-    event: PiRpcRecord,
+    event: JsonlRpcRecord,
   ): void {
     if (!this.isCurrentKernel(kernel, generation)) return;
     const active = this.activeRun;

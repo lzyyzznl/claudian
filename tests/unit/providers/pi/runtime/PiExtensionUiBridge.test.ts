@@ -1,5 +1,5 @@
+import type { JsonlRpcTransport } from '@/core/rpc/JsonlRpcTransport';
 import { PiExtensionUiBridge, type PiExtensionUiRenderer } from '@/providers/pi/runtime/PiExtensionUiBridge';
-import type { PiRpcTransport } from '@/providers/pi/runtime/PiRpcTransport';
 
 function createBridge(
   renderer: Partial<PiExtensionUiRenderer>,
@@ -7,7 +7,7 @@ function createBridge(
 ) {
   const transport = {
     send: jest.fn(),
-  } as unknown as PiRpcTransport;
+  } as unknown as JsonlRpcTransport;
   const bridge = new PiExtensionUiBridge(
     transport,
     renderer as PiExtensionUiRenderer,
@@ -38,7 +38,7 @@ describe('PiExtensionUiBridge', () => {
   it('cancels dialog requests when no renderer is available', () => {
     const transport = {
       send: jest.fn(),
-    } as unknown as PiRpcTransport;
+    } as unknown as JsonlRpcTransport;
     const bridge = new PiExtensionUiBridge(transport, null);
 
     bridge.handleRequest({ id: 'ui-1', method: 'confirm', type: 'extension_ui_request' });

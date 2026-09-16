@@ -1,13 +1,13 @@
 import type { Readable, Writable } from 'node:stream';
 
-import { subscribePiJsonlLines, writePiJsonl } from './PiJsonl';
+import { subscribeJsonlLines, writeJsonlLine } from './JsonlFraming';
 
 const DEFAULT_TIMEOUT_MS = 30_000;
 
-export type PiRpcRecord = Record<string, unknown>;
-export type PiRpcEventHandler = (event: PiRpcRecord) => void;
+export type JsonlRpcRecord = Record<string, unknown>;
+export type JsonlRpcEventHandler = (event: JsonlRpcRecord) => void;
 
-export interface PiRpcStreams {
+export interface JsonlRpcStreams {
   input: Readable | NodeJS.ReadableStream;
   onClose?: (listener: (error?: Error) => void) => () => void;
   output: Writable | NodeJS.WritableStream;
@@ -20,34 +20,34 @@ interface PendingRequest {
   type: string;
 }
 
-export class PiRpcTransportClosedError extends Error {
-  constructor(message = 'Pi RPC transport closed') {
+export class JsonlRpcTransportClosedError extends Error {
+  constructor(message = 'Jsonl RPC transport closed') {
     super(message);
-    this.name = 'PiRpcTransportClosedError';
+    this.name = 'JsonlRpcTransportClosedError';
   }
 }
 
-export class PiRpcResponseError extends Error {
+export class JsonlRpcResponseError extends Error {
   constructor(
     readonly commandType: string,
     message: string,
   ) {
     super(message);
-    this.name = 'PiRpcResponseError';
+    this.name = 'JsonlRpcResponseError';
   }
 }
 
-export class PiRpcTransport {
+export class JsonlRpcTransport {
   private readonly closeListeners = new Set<(error?: Error) => void>();
   private disposed = false;
-  private readonly eventHandlers = new Set<PiRpcEventHandler>();
+  private readonly eventHandlers = new Set<JsonlRpcEventHandler>();
   private nextId = 1;
   private readonly pending = new Map<string, PendingRequest>();
   private unregisterClose?: () => void;
   private unsubscribeLines?: () => void;
 
   constructor(
-    private readonly streams: PiRpcStreams,
+    private readonly streams: JsonlRpcStreams,
     private readonly defaultTimeoutMs = DEFAULT_TIMEOUT_MS,
   ) {}
 
@@ -60,12 +60,12 @@ export class PiRpcTransport {
       return;
     }
 
-    this.unsubscribeLines = subscribePiJsonlLines(
+    this.unsubscribeLines = subscribeJsonlLines(
       this.streams.input,
       (line) => this.handleLine(line),
       () => {
         if (!this.disposed) {
-          this.dispose(new PiRpcTransportClosedError('Pi RPC input closed'));
+          this.dispose(new JsonlRpcTransportClosedError('Jsonl RPC input closed'));
         }
       },
       (error) => {
@@ -77,12 +77,12 @@ export class PiRpcTransport {
 
     this.unregisterClose = this.streams.onClose?.((error) => {
       if (!this.disposed) {
-        this.dispose(error ?? new PiRpcTransportClosedError());
+        this.dispose(error ?? new JsonlRpcTransportClosedError());
       }
     });
   }
 
-  onEvent(handler: PiRpcEventHandler): () => void {
+  onEvent(handler: JsonlRpcEventHandler): () => void {
     this.eventHandlers.add(handler);
     return () => {
       this.eventHandlers.delete(handler);
@@ -104,7 +104,7 @@ export class PiRpcTransport {
   ): Promise<T> {
     this.start();
     if (this.disposed) {
-      return Promise.reject(new PiRpcTransportClosedError());
+      return Promise.reject(new JsonlRpcTransportClosedError());
     }
 
     const id = `req_${this.nextId++}`;
@@ -161,7 +161,7 @@ export class PiRpcTransport {
     });
   }
 
-  send(record: PiRpcRecord): void {
+  send(record: JsonlRpcRecord): void {
     this.start();
     if (this.disposed) {
       return;
@@ -169,7 +169,7 @@ export class PiRpcTransport {
     this.sendRaw(record);
   }
 
-  dispose(error: Error = new PiRpcTransportClosedError('Pi RPC transport disposed')): void {
+  dispose(error: Error = new JsonlRpcTransportClosedError('Jsonl RPC transport disposed')): void {
     if (this.disposed) {
       return;
     }
@@ -191,8 +191,8 @@ export class PiRpcTransport {
     this.eventHandlers.clear();
   }
 
-  private sendRaw(record: PiRpcRecord): void {
-    writePiJsonl(this.streams.output, record);
+  private sendRaw(record: JsonlRpcRecord): void {
+    writeJsonlLine(this.streams.output, record);
   }
 
   private handleLine(line: string): void {
@@ -200,7 +200,7 @@ export class PiRpcTransport {
       return;
     }
 
-    let record: PiRpcRecord;
+    let record: JsonlRpcRecord;
     try {
       const parsed = JSON.parse(line) as unknown;
       if (!isPlainObject(parsed)) {
@@ -221,7 +221,7 @@ export class PiRpcTransport {
     }
   }
 
-  private handleResponse(id: string, record: PiRpcRecord): void {
+  private handleResponse(id: string, record: JsonlRpcRecord): void {
     const pending = this.pending.get(id);
     if (!pending) {
       return;
@@ -232,8 +232,8 @@ export class PiRpcTransport {
     if (record.success === false) {
       const errorText = typeof record.error === 'string'
         ? record.error
-        : `Pi RPC command failed: ${pending.type}`;
-      pending.reject(new PiRpcResponseError(pending.type, errorText));
+        : `Jsonl RPC command failed: ${pending.type}`;
+      pending.reject(new JsonlRpcResponseError(pending.type, errorText));
       return;
     }
 
@@ -257,6 +257,6 @@ export class PiRpcTransport {
   }
 }
 
-function isPlainObject(value: unknown): value is PiRpcRecord {
+function isPlainObject(value: unknown): value is JsonlRpcRecord {
   return value !== null && typeof value === 'object' && !Array.isArray(value);
 }

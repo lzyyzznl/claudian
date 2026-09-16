@@ -1,6 +1,6 @@
 import type { Writable } from 'node:stream';
 
-export type PiJsonlLineHandler = (line: string) => void;
+export type JsonlLineHandler = (line: string) => void;
 
 interface JsonlReadableStream {
   off(eventName: 'data', listener: (chunk: Buffer | string) => void): unknown;
@@ -11,9 +11,9 @@ interface JsonlReadableStream {
   on(eventName: 'error', listener: (error: unknown) => void): unknown;
 }
 
-export function subscribePiJsonlLines(
+export function subscribeJsonlLines(
   input: JsonlReadableStream,
-  onLine: PiJsonlLineHandler,
+  onLine: JsonlLineHandler,
   onEnd?: () => void,
   onError?: (error: Error) => void,
 ): () => void {
@@ -59,7 +59,7 @@ export function subscribePiJsonlLines(
   };
 }
 
-export function writePiJsonl(
+export function writeJsonlLine(
   output: Writable | NodeJS.WritableStream,
   record: unknown,
 ): void {

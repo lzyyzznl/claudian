@@ -1,27 +1,28 @@
+import type { JsonlRpcRecord, JsonlRpcTransport } from '@/core/rpc/JsonlRpcTransport';
+
 import type { StreamChunk } from '../../../core/types';
-import type { PiRpcRecord, PiRpcTransport } from './PiRpcTransport';
 
-export interface PiExtensionUiSelectRequest extends PiRpcRecord {
+export interface PiExtensionUiSelectRequest extends JsonlRpcRecord {
   id: string;
 }
 
-export interface PiExtensionUiConfirmRequest extends PiRpcRecord {
+export interface PiExtensionUiConfirmRequest extends JsonlRpcRecord {
   id: string;
 }
 
-export interface PiExtensionUiInputRequest extends PiRpcRecord {
+export interface PiExtensionUiInputRequest extends JsonlRpcRecord {
   id: string;
 }
 
-export interface PiExtensionUiEditorRequest extends PiRpcRecord {
+export interface PiExtensionUiEditorRequest extends JsonlRpcRecord {
   id: string;
 }
 
-export type PiExtensionUiNotifyRequest = PiRpcRecord;
-export type PiExtensionUiSetEditorTextRequest = PiRpcRecord;
-export type PiExtensionUiSetStatusRequest = PiRpcRecord;
-export type PiExtensionUiSetTitleRequest = PiRpcRecord;
-export type PiExtensionUiSetWidgetRequest = PiRpcRecord;
+export type PiExtensionUiNotifyRequest = JsonlRpcRecord;
+export type PiExtensionUiSetEditorTextRequest = JsonlRpcRecord;
+export type PiExtensionUiSetStatusRequest = JsonlRpcRecord;
+export type PiExtensionUiSetTitleRequest = JsonlRpcRecord;
+export type PiExtensionUiSetWidgetRequest = JsonlRpcRecord;
 
 export interface PiExtensionUiRenderer {
   confirm(request: PiExtensionUiConfirmRequest, signal: AbortSignal): Promise<{ cancelled?: boolean; confirmed?: boolean }>;
@@ -39,13 +40,13 @@ export class PiExtensionUiBridge {
   private readonly pending = new Map<string, AbortController>();
 
   constructor(
-    private readonly transport: PiRpcTransport,
+    private readonly transport: JsonlRpcTransport,
     private readonly renderer: PiExtensionUiRenderer | null,
     private readonly emit?: (chunk: StreamChunk) => void,
-    private readonly admitDialog: (request: PiRpcRecord) => boolean = () => true,
+    private readonly admitDialog: (request: JsonlRpcRecord) => boolean = () => true,
   ) {}
 
-  handleRequest(request: PiRpcRecord): boolean {
+  handleRequest(request: JsonlRpcRecord): boolean {
     if (request.type !== 'extension_ui_request') {
       return false;
     }
@@ -107,7 +108,7 @@ export class PiExtensionUiBridge {
   }
 
   private handleDialog(
-    request: PiRpcRecord,
+    request: JsonlRpcRecord,
     render: (
       renderer: PiExtensionUiRenderer,
       signal: AbortSignal,
@@ -137,7 +138,7 @@ export class PiExtensionUiBridge {
       });
   }
 
-  private sendCancellation(request: PiRpcRecord): void {
+  private sendCancellation(request: JsonlRpcRecord): void {
     const id = getString(request.id);
     if (id) {
       this.sendResponse(id, { cancelled: true });
@@ -153,7 +154,7 @@ export class PiExtensionUiBridge {
   }
 }
 
-function requireDialogRequest<T extends PiRpcRecord & { id: string }>(request: PiRpcRecord): T {
+function requireDialogRequest<T extends JsonlRpcRecord & { id: string }>(request: JsonlRpcRecord): T {
   return request as T;
 }
 

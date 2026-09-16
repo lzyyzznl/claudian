@@ -1,20 +1,21 @@
+import {
+  type JsonlRpcRecord,
+  JsonlRpcTransport,
+} from '@/core/rpc/JsonlRpcTransport';
+
 import type { StreamChunk } from '../../../core/types';
 import {
   PiExtensionUiBridge,
   type PiExtensionUiRenderer,
 } from '../runtime/PiExtensionUiBridge';
 import type { PiLaunchSpec } from '../runtime/PiLaunchSpec';
-import {
-  type PiRpcRecord,
-  PiRpcTransport,
-} from '../runtime/PiRpcTransport';
 import { PiSubprocess } from '../runtime/PiSubprocess';
 
 export interface PiExecutionKernelCallbacks {
   onClose(error?: Error): void;
-  onEvent(event: PiRpcRecord): void;
+  onEvent(event: JsonlRpcRecord): void;
   onExtensionChunk(chunk: StreamChunk): void;
-  onExtensionRequest(request: PiRpcRecord): boolean;
+  onExtensionRequest(request: JsonlRpcRecord): boolean;
 }
 
 export interface PiExecutionKernel {
@@ -26,7 +27,7 @@ export interface PiExecutionKernel {
     timeoutMs?: number,
     signal?: AbortSignal,
   ): Promise<T>;
-  send(record: PiRpcRecord): void;
+  send(record: JsonlRpcRecord): void;
   shutdown(): Promise<void>;
   start(): void;
 }
@@ -39,7 +40,7 @@ export type PiExecutionKernelFactory = (
 
 export class PiRpcSessionKernel implements PiExecutionKernel {
   private readonly subprocess: PiSubprocess;
-  private transport: PiRpcTransport | null = null;
+  private transport: JsonlRpcTransport | null = null;
   private extensionBridge: PiExtensionUiBridge | null = null;
   private removeCloseListener: (() => void) | null = null;
   private removeEventListener: (() => void) | null = null;
@@ -61,7 +62,7 @@ export class PiRpcSessionKernel implements PiExecutionKernel {
     if (this.started) return;
     this.started = true;
     this.subprocess.start();
-    const transport = new PiRpcTransport({
+    const transport = new JsonlRpcTransport({
       input: this.subprocess.stdout,
       onClose: listener => this.subprocess.onClose(listener),
       output: this.subprocess.stdin,
@@ -100,7 +101,7 @@ export class PiRpcSessionKernel implements PiExecutionKernel {
     return this.requireTransport().request(type, payload, timeoutMs, signal);
   }
 
-  send(record: PiRpcRecord): void {
+  send(record: JsonlRpcRecord): void {
     this.requireTransport().send(record);
   }
 
@@ -122,7 +123,7 @@ export class PiRpcSessionKernel implements PiExecutionKernel {
     await this.subprocess.shutdown();
   }
 
-  private requireTransport(): PiRpcTransport {
+  private requireTransport(): JsonlRpcTransport {
     if (!this.transport) {
       throw new Error('Pi execution kernel is not started');
     }

@@ -16,6 +16,7 @@ Do not assume provider parity. Check each provider's `capabilities.ts`, `registr
   - `src/providers/claude/AGENTS.md`
   - `src/providers/codex/AGENTS.md`
   - `src/providers/grok/AGENTS.md`
+  - `src/providers/omp/AGENTS.md`
   - `src/providers/opencode/AGENTS.md`
   - `src/providers/pi/AGENTS.md`
   - `src/style/AGENTS.md`

@@ -18,6 +18,7 @@ describe('built-in ProviderModule catalog', () => {
       'grok',
       'opencode',
       'pi',
+      'omp',
     ]);
     for (const module of BUILT_IN_PROVIDER_MODULES) {
       expect(module.workspace.initialize).toEqual(expect.any(Function));
@@ -58,6 +59,9 @@ describe('built-in ProviderModule catalog', () => {
     Object.assign(getProviderConfig(malformedSettings, 'pi'), {
       toolMode: 'danger-full-access',
     });
+    Object.assign(getProviderConfig(malformedSettings, 'omp'), {
+      toolMode: 'danger-full-access',
+    });
 
     const defaultEnabled: Record<string, boolean> = {
       claude: true,
@@ -65,6 +69,7 @@ describe('built-in ProviderModule catalog', () => {
       grok: false,
       opencode: false,
       pi: false,
+      omp: false,
     };
 
     for (const module of BUILT_IN_PROVIDER_MODULES) {
@@ -104,6 +109,9 @@ describe('built-in ProviderModule catalog', () => {
       selectedMode: 'claudian-safe',
     });
     expect(getProviderConfig(normalizedSettings, 'pi')).toMatchObject({
+      toolMode: 'readonly',
+    });
+    expect(getProviderConfig(normalizedSettings, 'omp')).toMatchObject({
       toolMode: 'readonly',
     });
   });

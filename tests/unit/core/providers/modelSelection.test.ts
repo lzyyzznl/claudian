@@ -12,6 +12,7 @@ describe('model selection namespacing', () => {
       expect(getProviderModelSelectionPrefix('claude')).toBe('claude-code/');
       expect(getProviderModelSelectionPrefix('codex')).toBe('openai-codex/');
       expect(getProviderModelSelectionPrefix('opencode')).toBe('opencode/');
+      expect(getProviderModelSelectionPrefix('omp')).toBe('omp/');
       expect(getProviderModelSelectionPrefix('pi')).toBe('pi/');
       expect(getProviderModelSelectionPrefix('grok')).toBe('grok/');
     });
@@ -145,6 +146,7 @@ describe('model selection namespacing', () => {
       ['claude', 'claude-code/', 'deepseek-v4-pro'],
       ['codex', 'openai-codex/', 'gpt-5-custom'],
       ['opencode', 'opencode/', 'qwen-max'],
+      ['omp', 'omp/', 'deepseek-flash'],
       ['pi', 'pi/', 'assistant-1'],
       ['grok', 'grok/', 'kimi-coding'],
     ] as const)('round-trips a %s model id through encode and toRuntimeModelId', (providerId, prefix, modelId) => {

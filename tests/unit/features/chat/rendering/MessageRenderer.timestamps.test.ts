@@ -12,7 +12,7 @@ HTMLElement.prototype.setText = function (text) { this.textContent = String(text
 HTMLElement.prototype.empty = function () { this.replaceChildren(); };
 HTMLElement.prototype.addClass = function (...classes) { this.classList.add(...classes); };
 
-const providers: ProviderId[] = ['claude', 'codex', 'grok', 'opencode', 'pi'];
+const providers: ProviderId[] = ['claude', 'codex', 'grok', 'omp', 'opencode', 'pi'];
 const timestamp = 1786528800000;
 
 function createRenderer(providerId: ProviderId, enabled = true) {

@@ -1854,7 +1854,7 @@ export default class ClaudianPlugin extends Plugin {
   }
 
   async notifyAgentSkillsChanged(): Promise<void> {
-    const providerIds: ProviderId[] = ['codex', 'grok', 'pi', 'opencode'];
+    const providerIds: ProviderId[] = ['codex', 'grok', 'omp', 'pi', 'opencode'];
     const generation = ++this.agentSkillResourceGeneration;
 
     for (const view of this.getAllViews()) {

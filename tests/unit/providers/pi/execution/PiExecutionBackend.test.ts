@@ -2342,9 +2342,11 @@ describe('PiExecutionBackend', () => {
 
     expect(forkFile).not.toBe(sourceFile);
     expect(path.dirname(forkFile)).toBe(tempDir);
-    expect(await fs.readFile(forkFile, 'utf8')).toContain(
-      `"parentSession":"${sourceFile}"`,
+    // Compare the decoded header, not raw bytes: JSON escapes path separators on Windows.
+    const forkHeader: unknown = JSON.parse(
+      (await fs.readFile(forkFile, 'utf8')).split('\n')[0],
     );
+    expect(forkHeader).toMatchObject({ type: 'session', parentSession: sourceFile });
     const snapshot = harness.session.getSnapshot();
     expect(snapshot.providerState).toMatchObject({
       futureState: { retained: true },

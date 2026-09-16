@@ -11,6 +11,9 @@ import { codexProviderRegistration } from '@/providers/codex/registration';
 import { GrokCommandCatalog } from '@/providers/grok/commands/GrokCommandCatalog';
 import { GrokExecutionBackend } from '@/providers/grok/execution/GrokExecutionBackend';
 import { grokProviderRegistration } from '@/providers/grok/registration';
+import { OmpCommandCatalog } from '@/providers/omp/commands/OmpCommandCatalog';
+import { OmpExecutionBackend } from '@/providers/omp/execution/OmpExecutionBackend';
+import { ompProviderRegistration } from '@/providers/omp/registration';
 import { OpencodeCommandCatalog } from '@/providers/opencode/commands/OpencodeCommandCatalog';
 import { OpencodeExecutionBackend } from '@/providers/opencode/execution/OpencodeExecutionBackend';
 import { opencodeProviderRegistration } from '@/providers/opencode/registration';
@@ -59,6 +62,7 @@ describe('provider execution registration', () => {
       grokProviderRegistration,
       opencodeProviderRegistration,
       piProviderRegistration,
+      ompProviderRegistration,
     ]) {
       expect(registration).toHaveProperty('createExecutionBackend', expect.any(Function));
       expect(
@@ -87,6 +91,9 @@ describe('provider execution registration', () => {
     ProviderWorkspaceRegistry.setServices('pi', {
       commandCatalog: new PiCommandCatalog(),
     } as any);
+    ProviderWorkspaceRegistry.setServices('omp', {
+      commandCatalog: new OmpCommandCatalog(),
+    });
 
     expect(ProviderRegistry.createExecutionBackend(host, 'claude'))
       .toBeInstanceOf(ClaudeExecutionBackend);
@@ -98,6 +105,8 @@ describe('provider execution registration', () => {
       .toBeInstanceOf(OpencodeExecutionBackend);
     expect(ProviderRegistry.createExecutionBackend(host, 'pi'))
       .toBeInstanceOf(PiExecutionBackend);
+    expect(ProviderRegistry.createExecutionBackend(host, 'omp'))
+      .toBeInstanceOf(OmpExecutionBackend);
   });
 
   it('registers Claude transcript recovery without provider parity placeholders', () => {
@@ -109,5 +118,6 @@ describe('provider execution registration', () => {
     expect(ProviderRegistry.createSubagentHistoryService(host, 'grok')).toBeNull();
     expect(ProviderRegistry.createSubagentHistoryService(host, 'opencode')).toBeNull();
     expect(ProviderRegistry.createSubagentHistoryService(host, 'pi')).toBeNull();
+    expect(ProviderRegistry.createSubagentHistoryService(host, 'omp')).toBeNull();
   });
 });

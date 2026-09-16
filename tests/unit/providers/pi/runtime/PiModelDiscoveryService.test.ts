@@ -12,8 +12,8 @@ const mockProcessOnClose = jest.fn();
 const mockGetStderrSnapshot = jest.fn(() => '');
 let mockEventHandler: ((event: Record<string, unknown>) => void) | null = null;
 
-jest.mock('@/providers/pi/runtime/PiRpcTransport', () => ({
-  PiRpcTransport: jest.fn().mockImplementation(() => ({
+jest.mock('@/core/rpc/JsonlRpcTransport', () => ({
+  JsonlRpcTransport: jest.fn().mockImplementation(() => ({
     dispose: mockTransportDispose,
     onEvent: mockTransportOnEvent,
     request: mockTransportRequest,
